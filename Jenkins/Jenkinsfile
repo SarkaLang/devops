@@ -1,0 +1,40 @@
+pipeline {
+  //select agent - vybrat agenta
+  agent any
+
+  //nástroje co potřebuju
+  tools {
+    maven "MAVEN3.9"
+    jdk "JDK17"
+  }
+  
+  //etapy
+  stages {
+      stage('Fetch code') {
+       //jednotlivé kroky
+        steps{
+         git branch: 'atom', url: 'https://github.com/hkhcoder/vprofile-project.git'
+        }
+       }
+
+      stage('Unit Test') {
+       steps{
+         sh 'mvn test'
+        }
+      }
+
+      stage('Build') {
+       steps{
+        sh 'mvn install -DskipTests'
+        }
+        post{
+          success {
+           echo "Archiving artifact"
+            archiveArtifacts artifacts: '**/*.war'
+          }
+        }
+       }
+
+    }
+}
+
